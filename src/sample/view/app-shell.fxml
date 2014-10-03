@@ -5,11 +5,9 @@
 	stylesheets="@../styles/main.css">
 	<center>
 		<StackPane fx:id="contentPane">
-			<HBox alignment="CENTER">
-				<Group fx:id="userPattern" />
-				<Group fx:id="levelPattern" />
-				<Group fx:id="gridBackground" />
-			</HBox>
+			<Group fx:id="gridBackground" mouseTransparent="true" />
+			<Group fx:id="levelPattern" mouseTransparent="true" />
+			<Group fx:id="userPattern" visible="false" />
 		</StackPane>
 	</center>
 	<top>
@@ -23,7 +21,7 @@
 	<bottom>
 		<Pane id="commandPane" fx:id="commandPane" prefHeight="60.0">
    			<HBox>
-				<Button fx:id="generateButton" mnemonicParsing="false" text="Generate" />
+				<Button fx:id="generateButton" onAction="#actionGenerate" mnemonicParsing="false" text="Generate" />
    			</HBox>
 		</Pane>
 	</bottom>

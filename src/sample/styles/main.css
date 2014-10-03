@@ -41,8 +41,12 @@
 	-fx-border-width: 6;
 }
 
-.background-dot {
+#gridBackground Circle {
 	-fx-fill: #30333A;
+}
+
+#levelPattern Circle {
+	-fx-fill: #2a5fa0;
 }
 
 #commandPane {

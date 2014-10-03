@@ -1,6 +1,9 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -10,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import sample.view.DotPattern;
 
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +31,8 @@ public class App extends Application
 		@FXML private Pane contentPane;
 		@FXML private Pane commandPane;
 		@FXML private Button generateButton;
+
+		private DotPattern pattern;
 
 		public void start(Stage primaryStage)
 		{
@@ -69,18 +75,48 @@ public class App extends Application
 			for (byte col = 0; col < gridXCount; ++col)
 				for (byte row = 0; row < gridYCount; ++row) {
 					Circle dot = new Circle(col * 40.0, row * 40, 8.0);
-					dot.getStyleClass().add("background-dot");
 					gridBackground.getChildren().add(dot);
-					gridBackground.setMouseTransparent(true);
 				}
 		}
 
 		@FXML
-		public void actionGenerate() { }
+		public void actionGenerate() {
+
+			levelPattern.setVisible(false);
+			levelPattern.getChildren().clear();
+
+			pattern = new DotPattern(8, 8);
+
+			pattern.setDotsPerPattern(26);
+			pattern.setShapesPerPattern(3);
+			pattern.setAllowDiagonals(false);
+			pattern.setAllowOpen(false);
+			pattern.generate();
+
+			// draw shapes
+
+			/*
+			for (byte col = 0; col < gridXCount; ++col)
+				for (byte row = 0; row < gridYCount; ++row) {
+					Circle dot = new Circle(col * 40.0, row * 40, 5.0);
+					levelPattern.getChildren().add(dot);
+				}
+			*/
+
+			levelPattern.setVisible(true);
+		}
 
 		@Override
 		public void initialize(URL location, ResourceBundle resources) {
 
+			/*
+			generateButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+
+				}
+			});
+			*/
 		}
 	}
 
