@@ -1,6 +1,4 @@
-package sample.view;
-
-import sample.DotShape;
+package sample;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,33 +57,40 @@ public class DotPattern
 
 		shapes.clear();
 
-		int minDPS = (!isAllowDiagonals() && !isAllowOpen() ? 4 : (isAllowOpen() ? 2 : 3));
+		System.out.println("Generating pattern");
 
-		System.out.println("Dots per shape min: " + minDPS);
-
-		for (int dotsRemains = getDotsPerPattern(); dotsRemains > 0; ) {
-			int shapesRemains = getShapesPerPattern() - shapes.size();
-			int dots = (shapesRemains == 1) ? dotsRemains : (dotsRemains - shapesRemains * minDPS) / shapesRemains;
-
-			if (shapesRemains > 1) {
-				dots = minDPS + (int) Math.round(Math.random() * dots);
+		int dpsMin = (!isAllowDiagonals() && !isAllowOpen() ? 4 : (isAllowOpen() ? 2 : 3));
+		for ( int sr = getShapesPerPattern(), dr = getDotsPerPattern(); sr > 0 && dr > 0; --sr) {
+			int dots;
+			if (sr == 1) { // last
+				dots = dr;
+			}
+			else {
+				double pcut = 100 - ((sr - 1) * dpsMin / (dr / 100.0));
+				dots = new Random().nextInt((int) Math.round(dr * pcut / 100));
+				if (dots % 2 != 0 && (!isAllowDiagonals() && !isAllowOpen()))
+					dots -= 1;
 			}
 
-			if (dots % 2 != 0 && (!isAllowDiagonals() && !isAllowOpen()))
-				dots = Math.min(minDPS, dots + 1);
-
-			dotsRemains -= dots;
+			dr -= dots = Math.max(dpsMin, dots);
 			shapes.add(generateShape(dots));
-
-			System.out.println("Generating shape using " + dots + " dots. Remains " + dotsRemains);
 		}
 	}
 
-	private DotShape generateShape(int maxDots) {
+	/**
+	 * Generates dot shape using given number of dots.
+	 * Shape can be closed/open and have or not diagonal lines.
+	 *
+	 * @param dps Dots per shape. Must be positive
+	 * @return Shape
+	 */
+	private DotShape generateShape(int dps) {
 
 		// 1. find free rectangular block
 		// 2. randomize coords
 		// 3. generate shape
+
+		// System.out.println("creating shape_#" + shapes.size() + ". dots " + dots + ". " + dr + " dots remains");
 
 		return new DotShape();
 	}

@@ -1,9 +1,6 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import sample.view.DotPattern;
 
 import java.io.IOException;
 import java.net.URL;
@@ -87,7 +83,7 @@ public class App extends Application
 
 			pattern = new DotPattern(8, 8);
 
-			pattern.setDotsPerPattern(26);
+			pattern.setDotsPerPattern(22);
 			pattern.setShapesPerPattern(3);
 			pattern.setAllowDiagonals(false);
 			pattern.setAllowOpen(false);
