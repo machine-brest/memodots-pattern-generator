@@ -4,10 +4,12 @@
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	stylesheets="@../styles/main.css">
 	<center>
-		<StackPane fx:id="contentPane">
-			<Group fx:id="gridBackground" mouseTransparent="true" />
-			<Group fx:id="levelPattern" mouseTransparent="true" />
-			<Group fx:id="userPattern" visible="false" />
+		<StackPane fx:id="contentPane" alignment="CENTER">
+			<Group>
+				<Group fx:id="gridBackground" mouseTransparent="true" />
+				<Group fx:id="levelPattern" mouseTransparent="true" />
+				<Group fx:id="userPattern" visible="false" />
+			</Group>
 		</StackPane>
 	</center>
 	<top>

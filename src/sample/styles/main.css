@@ -49,6 +49,11 @@
 	-fx-fill: #2a5fa0;
 }
 
+#levelPattern Line {
+	-fx-stroke: #2a5fa0;
+	-fx-stroke-width: 3.0;
+}
+
 #commandPane {
 	-fx-background-color: #42474F;
 }

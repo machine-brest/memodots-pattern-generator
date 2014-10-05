@@ -1,29 +1,25 @@
 package sample;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DotShape
 {
-	/**
-	 * Contains shape vertices
-	 */
-	private List<Dot> dots = new LinkedList<Dot>();
+	private Boolean closed = false;
+	private List<DotPoint> dots = new ArrayList<DotPoint>();
 
 	public DotShape() {}
 
-	public List<Dot> getDots() {
+	public List<DotPoint> getDots() {
 		return dots;
 	}
 
-	public class Dot {
+	public Boolean isClosed() {
+		return closed;
+	}
 
-		public int x;
-		public int y;
-
-		private Dot(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
+	public void setClosed(Boolean closed) {
+		this.closed = closed;
 	}
 }
