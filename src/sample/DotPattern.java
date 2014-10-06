@@ -11,7 +11,6 @@ public class DotPattern
 	private boolean isAllowOpen = false;
 	private boolean isAllowDiagonals = false;
 
-	private byte[][] grid;
 	private List<DotShape> shapes;
 
 	public DotPattern(int columns, int rows) {
@@ -42,13 +41,19 @@ public class DotPattern
 	 */
 	public void generate() {
 
-		grid   = new byte[columns][rows];
 		shapes = new ArrayList<DotShape>(shapesPerPattern);
-
 		System.out.println("Generating pattern " + columns + "x" + rows );
 
+		List<Dot> freeDots = new ArrayList<Dot>();
+		for (int dotIndex = 0, l = columns * rows; dotIndex < l; ++ dotIndex) {
+			Dot dot = new Dot();
+			dot.x = dotIndex % columns;
+			dot.y = (dotIndex - dot.x) / columns;
+			freeDots.add(dot);
+		}
+
 		int dpsMin = (!isAllowDiagonals() && !isAllowOpen() ? 4 : (isAllowOpen() ? 2 : 3));
-		for ( int sr = shapesPerPattern, dr = dotsPerPattern; sr > 0 && dr > 0; --sr) {
+		for ( int sr = shapesPerPattern, dr = dotsPerPattern; sr > 0 && dr > 0 && !freeDots.isEmpty(); --sr) {
 			int dots;
 			if (sr == 1) { // last
 				dots = dr;
@@ -61,7 +66,18 @@ public class DotPattern
 			}
 
 			dr -= dots = Math.max(dpsMin, dots);
-			shapes.add(generateShape(dots));
+
+			DotShape shape = new DotShape();
+			shape.setMaxDotCount(dots);
+
+			if (generateShape(new ArrayList<Dot>(freeDots), shape)) {
+				freeDots.removeAll(shape.getDots());
+				shapes.add(shape);
+			}
+			else {
+				System.out.printf("Could not create shape. No more free dots");
+				break;
+			}
 		}
 	}
 
@@ -69,82 +85,75 @@ public class DotPattern
 	 * Generates dot shape using given number of dots.
 	 * Shape can be closed/open and have or not diagonal lines.
 	 *
-	 * @param dps Dots per shape. Must be positive
+	 * @param freeDots Free dots to use
 	 * @return Shape
 	 */
-	protected DotShape generateShape(int dps) {
+	protected Boolean generateShape(List<Dot> freeDots, DotShape shape) {
 
-		System.out.printf("Creating shape from %d dots\n----------------------\n", dps);
+		if (freeDots.isEmpty())
+			return false;
 
-		DotPoint dot = new DotPoint();
-		int dotIndex = new Random().nextInt(columns * rows);
-		dot.x = dotIndex % columns;
-		dot.y = (dotIndex - dot.x) / columns;
+		Dot dot = freeDots.size() > 1
+				? freeDots.get(new Random().nextInt(freeDots.size() - 1))
+				: freeDots.get(0);
 
-		System.out.printf("Initial location %d,%d\n", dot.x, dot.y);
+		System.out.printf("Building a shape. Start from %d,%d\n", dot.x, dot.y);
 
-		DotShape shape = new DotShape();
-
-		for (int i = 0; i < dps; ++i) {
-
-			DotPoint newDot = generateShapeDot(shape, dot);
-
-			if (newDot != null) {
-				System.out.printf("   added point %d,%d\n", newDot.x, newDot.y);
-				shape.getDots().add(newDot);
-				grid[newDot.x][newDot.y] = 1;
-				dot = newDot;
-			}
+		if (generateShapeDots(shape, dot, new ArrayList<Dot>(freeDots))) {
+			return true;
 		}
 
-		if (!isAllowOpen()) {
-			shape.setClosed(true);
-		}
-
-		return shape;
+		freeDots.remove(dot);
+		return generateShape(freeDots, shape);
 	}
 
-	protected DotPoint generateShapeDot(DotShape shape, DotPoint from) {
+	protected Boolean generateShapeDots(DotShape shape, Dot from, List<Dot> freeDots) {
 
-		int dotx = from.x;
-		int doty = from.y;
+		if (freeDots.isEmpty())
+			return false;
 
-		List<DotPoint> dots = new ArrayList<DotPoint>();
+		System.out.printf("added point %d,%d\n", from.x, from.y);
 
-		if (dotx + 1 < columns) dots.add(new DotPoint(dotx + 1, doty));
-		if (doty + 1 < rows)    dots.add(new DotPoint(dotx, doty + 1));
-		if (dotx - 1 > -1)      dots.add(new DotPoint(dotx - 1, doty));
-		if (doty - 1 > -1)      dots.add(new DotPoint(dotx, doty - 1));
+		shape.getDots().add(from);
 
-		if (isAllowDiagonals()) {
-			if (dotx + 1 < columns && doty + 1 < rows) dots.add(new DotPoint(dotx + 1, doty + 1));
-			if (dotx - 1 > -1 && doty + 1 < rows)      dots.add(new DotPoint(dotx - 1, doty + 1));
-			if (dotx - 1 > -1 && doty - 1 > -1)        dots.add(new DotPoint(dotx - 1, doty - 1));
-			if (dotx + 1 < columns && doty - 1 > -1)   dots.add(new DotPoint(dotx + 1, doty - 1));
-		}
+		if (shape.getDots().size() < shape.getDotsMaxCount()) {
 
-		// check dots
+			// all connected dots
 
-		for (Iterator<DotPoint> i = dots.iterator(); i.hasNext(); ) {
-			DotPoint dot = i.next();
-			if (grid[dot.x][dot.y] == 1 || shape.getDots().contains(dot)) {
-				i.remove();
+			List<Dot> dots = new ArrayList<Dot>();
+
+			if (from.x + 1 < columns) dots.add(new Dot(from.x + 1, from.y));
+			if (from.y + 1 < rows)    dots.add(new Dot(from.x, from.y + 1));
+			if (from.x - 1 > -1)      dots.add(new Dot(from.x - 1, from.y));
+			if (from.y - 1 > -1)      dots.add(new Dot(from.x, from.y - 1));
+
+			if (isAllowDiagonals()) {
+				if (from.x + 1 < columns && from.y + 1 < rows) dots.add(new Dot(from.x + 1, from.y + 1));
+				if (from.x - 1 > -1 && from.y + 1 < rows)      dots.add(new Dot(from.x - 1, from.y + 1));
+				if (from.x - 1 > -1 && from.y - 1 > -1)        dots.add(new Dot(from.x - 1, from.y - 1));
+				if (from.x + 1 < columns && from.y - 1 > -1)   dots.add(new Dot(from.x + 1, from.y - 1));
 			}
 
-			// check if shape can be closed on this point
+			// check dots
 
-			if (!isAllowOpen()) {
-				if (shape.getDots().size() > 0) {
-					DotPoint firstDot = shape.getDots().get(0);
+			for (Iterator<Dot> i = dots.iterator(); i.hasNext(); ) {
+				Dot dot = i.next();
+
+				if (freeDots.contains(dot) && shape.getDots().contains(dot)) {
+					i.remove();
 				}
 			}
+
+			if (dots.size() == 0)
+				return false;
+
+			Dot newDot = dots.size() > 1
+					? dots.get(new Random().nextInt(dots.size() - 1))
+					: dots.get(0);
+
+			return generateShapeDots(shape, newDot, freeDots);
 		}
 
-		if (dots.size() == 0)
-			return null;
-
-		DotPoint dot = dots.get(new Random().nextInt(dots.size()));
-
-		return new DotPoint(dot.x, dot.y);
+		return true;
 	}
 }

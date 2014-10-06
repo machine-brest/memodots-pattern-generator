@@ -46,12 +46,17 @@
 }
 
 #levelPattern Circle {
-	-fx-fill: #2a5fa0;
+	-fx-fill: #eec55f;
 }
 
-#levelPattern Line {
-	-fx-stroke: #2a5fa0;
+#levelPattern Polyline {
+	-fx-stroke: #eec55f;
 	-fx-stroke-width: 3.0;
+}
+
+#levelPattern Polygon {
+	-fx-fill: #eec55f;
+	-fx-opacity: 0.1;
 }
 
 #commandPane {

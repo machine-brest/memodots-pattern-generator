@@ -1,25 +1,30 @@
 package sample;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DotShape
 {
-	private Boolean closed = false;
-	private List<DotPoint> dots = new ArrayList<DotPoint>();
+	private List<Dot> dots = new LinkedList<Dot>();
+
+	private int dotMaxCount;
 
 	public DotShape() {}
 
-	public List<DotPoint> getDots() {
+	public List<Dot> getDots() {
 		return dots;
 	}
 
 	public Boolean isClosed() {
-		return closed;
+		// todo: check
+		return true;
 	}
 
-	public void setClosed(Boolean closed) {
-		this.closed = closed;
+	public int getDotsMaxCount() {
+		return dotMaxCount;
+	}
+
+	public void setMaxDotCount(int dotMaxCount) {
+		this.dotMaxCount = dotMaxCount;
 	}
 }

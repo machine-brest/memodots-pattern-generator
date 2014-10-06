@@ -4,18 +4,19 @@ import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Polyline;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class App extends Application
@@ -73,7 +74,7 @@ public class App extends Application
 
 			for (byte col = 0; col < gridXCount; ++col)
 				for (byte row = 0; row < gridYCount; ++row) {
-					Circle dot = new Circle(col * 40.0, row * 40, 8.0);
+					Circle dot = new Circle(col * 40.0, row * 40, 7.0);
 					gridBackground.getChildren().add(dot);
 				}
 		}
@@ -87,37 +88,36 @@ public class App extends Application
 			pattern = new DotPattern(8, 8);
 
 			pattern.setDotsPerPattern(12);
-			pattern.setShapesPerPattern(1);
-			pattern.setAllowDiagonals(false);
+			pattern.setShapesPerPattern(3);
+			pattern.setAllowDiagonals(true);
 			pattern.setAllowOpen(false);
 			pattern.generate();
 
-			// draw shapes
+			// drawing shapes
 
 			for (DotShape shape: pattern.getShapes()) {
 
-				DotPoint dotFirst = null;
-				DotPoint dotPrev  = null;
+				List<Double> shapePoints = new ArrayList<Double>();
 
-				for (DotPoint dot: shape.getDots()) {
+				// drawing shape's points
+				for (Dot dot: shape.getDots()) {
+					shapePoints.add(dot.x * 40.0);
+					shapePoints.add(dot.y * 40.0);
 
-					Circle circle = new Circle(dot.x * 40.0, dot.y * 40.0, 8.0);
+					Circle circle = new Circle(dot.x * 40.0, dot.y * 40.0, 7.0);
 					levelPattern.getChildren().add(circle);
-
-					if (dotFirst == null)
-						dotFirst = dot;
-
-					if (dotPrev != null) {
-						Line line = new Line(dot.x * 40.0, dot.y * 40.0, dotPrev.x * 40.0, dotPrev.y * 40.0);
-						levelPattern.getChildren().add(line);
-					}
-
-					dotPrev = dot;
 				}
 
-				if (shape.isClosed() && dotFirst != null && dotPrev != null) {
-					Line line = new Line(dotFirst.x * 40.0, dotFirst.y * 40.0, dotPrev.x * 40.0, dotPrev.y * 40.0);
-					levelPattern.getChildren().add(line);
+				// drawing shape sides
+				Polyline polyline = new Polyline();
+				polyline.getPoints().addAll(shapePoints);
+				levelPattern.getChildren().add(polyline);
+
+				// fill shape if is closed
+				if (shape.isClosed()) {
+					Polygon polygon = new Polygon();
+					polygon.getPoints().addAll(shapePoints);
+					levelPattern.getChildren().add(polygon);
 				}
 			}
 
