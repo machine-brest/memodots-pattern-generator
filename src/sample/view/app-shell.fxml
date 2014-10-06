@@ -6,8 +6,8 @@
 	<center>
 		<StackPane fx:id="contentPane" alignment="CENTER">
 			<Group>
-				<Group fx:id="gridBackground" mouseTransparent="true" />
-				<Group fx:id="levelPattern" mouseTransparent="true" />
+				<Group fx:id="gridBackground" autoSizeChildren="false" mouseTransparent="true" />
+				<Group fx:id="levelPattern" autoSizeChildren="false" mouseTransparent="true" />
 				<Group fx:id="userPattern" visible="false" />
 			</Group>
 		</StackPane>

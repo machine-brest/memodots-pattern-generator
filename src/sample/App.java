@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class App extends Application
@@ -74,7 +75,7 @@ public class App extends Application
 
 			for (byte col = 0; col < gridXCount; ++col)
 				for (byte row = 0; row < gridYCount; ++row) {
-					Circle dot = new Circle(col * 40.0, row * 40, 7.0);
+					Circle dot = new Circle(col * 40d, row * 40d, 8d);
 					gridBackground.getChildren().add(dot);
 				}
 		}
@@ -89,8 +90,10 @@ public class App extends Application
 
 			pattern.setDotsPerPattern(12);
 			pattern.setShapesPerPattern(3);
-			pattern.setAllowDiagonals(true);
+			pattern.setAllowDiagonals(false);
+			pattern.setColorsPerPattern(3);
 			pattern.setAllowOpen(false);
+
 			pattern.generate();
 
 			// drawing shapes
@@ -99,26 +102,34 @@ public class App extends Application
 
 				List<Double> shapePoints = new ArrayList<Double>();
 
+				// selecting random color
+				String colorStyle = "color" + new Random().nextInt(pattern.getColorsPerPattern() + 1);
+
 				// drawing shape's points
 				for (Dot dot: shape.getDots()) {
-					shapePoints.add(dot.x * 40.0);
-					shapePoints.add(dot.y * 40.0);
+					shapePoints.add(dot.x * 40d);
+					shapePoints.add(dot.y * 40d);
 
-					Circle circle = new Circle(dot.x * 40.0, dot.y * 40.0, 7.0);
+					Circle circle = new Circle(dot.x * 40d, dot.y * 40d, 7.5d);
+					circle.getStyleClass().add(colorStyle);
 					levelPattern.getChildren().add(circle);
 				}
 
 				// drawing shape sides
 				Polyline polyline = new Polyline();
 				polyline.getPoints().addAll(shapePoints);
-				levelPattern.getChildren().add(polyline);
+				polyline.getStyleClass().add(colorStyle);
 
 				// fill shape if is closed
 				if (shape.isClosed()) {
+
 					Polygon polygon = new Polygon();
 					polygon.getPoints().addAll(shapePoints);
+					polygon.getStyleClass().add(colorStyle);
 					levelPattern.getChildren().add(polygon);
 				}
+
+				levelPattern.getChildren().add(polyline);
 			}
 
 			levelPattern.setVisible(true);

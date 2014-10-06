@@ -43,21 +43,39 @@
 
 #gridBackground Circle {
 	-fx-fill: #30333A;
+	-fx-snap-to-pixel: false;
+	-fx-snap-to-ticks: true;
 }
 
 #levelPattern Circle {
-	-fx-fill: #eec55f;
+	-fx-stroke: transparent;
+	-fx-snap-to-pixel: false;
+	-fx-snap-to-ticks: true;
 }
 
 #levelPattern Polyline {
-	-fx-stroke: #eec55f;
 	-fx-stroke-width: 3.0;
 }
 
 #levelPattern Polygon {
-	-fx-fill: #eec55f;
 	-fx-opacity: 0.1;
 }
+
+#levelPattern Circle.color0   { -fx-fill: #eec55f; }
+#levelPattern Polyline.color0 { -fx-stroke: #eec55f; }
+#levelPattern Polygon.color0  { -fx-fill: #eec55f; }
+
+#levelPattern Circle.color1   { -fx-fill: #df564b; }
+#levelPattern Polyline.color1 { -fx-stroke: #df564b; }
+#levelPattern Polygon.color1  { -fx-fill: #df564b; }
+
+#levelPattern Circle.color2   { -fx-fill: #2abea2; }
+#levelPattern Polyline.color2 { -fx-stroke: #2abea2; }
+#levelPattern Polygon.color2  { -fx-fill: #2abea2; }
+
+#levelPattern Circle.color3   { -fx-fill: #18c5d8; }
+#levelPattern Polyline.color3 { -fx-stroke: #18c5d8; }
+#levelPattern Polygon.color3  { -fx-fill: #18c5d8; }
 
 #commandPane {
 	-fx-background-color: #42474F;
