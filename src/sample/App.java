@@ -88,9 +88,9 @@ public class App extends Application
 
 			pattern = new DotPattern(8, 8);
 
-			pattern.setDotsPerPattern(12);
+			pattern.setDotsPerPattern(26);
 			pattern.setShapesPerPattern(3);
-			pattern.setAllowDiagonals(false);
+			pattern.setAllowDiagonals(true);
 			pattern.setColorsPerPattern(3);
 			pattern.setAllowOpen(false);
 
@@ -116,20 +116,22 @@ public class App extends Application
 				}
 
 				// drawing shape sides
-				Polyline polyline = new Polyline();
-				polyline.getPoints().addAll(shapePoints);
-				polyline.getStyleClass().add(colorStyle);
+				Polyline shapeFrame = new Polyline();
+				shapeFrame.getPoints().addAll(shapePoints);
+				shapeFrame.getStyleClass().add(colorStyle);
 
-				// fill shape if is closed
 				if (shape.isClosed()) {
 
-					Polygon polygon = new Polygon();
-					polygon.getPoints().addAll(shapePoints);
-					polygon.getStyleClass().add(colorStyle);
-					levelPattern.getChildren().add(polygon);
+					Dot first = shape.getFirst();
+					shapeFrame.getPoints().addAll(first.x * 40d, first.y * 40d);
+
+					Polygon shapeFill = new Polygon();
+					shapeFill.getPoints().addAll(shapePoints);
+					shapeFill.getStyleClass().add(colorStyle);
+					levelPattern.getChildren().add(shapeFill);
 				}
 
-				levelPattern.getChildren().add(polyline);
+				levelPattern.getChildren().add(shapeFrame);
 			}
 
 			levelPattern.setVisible(true);

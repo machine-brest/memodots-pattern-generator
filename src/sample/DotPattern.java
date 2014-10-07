@@ -75,9 +75,12 @@ public class DotPattern
 			dr -= dots = Math.max(dpsMin, dots);
 
 			DotShape shape = new DotShape();
-			shape.setMaxDotCount(dots);
+			shape.setMaxSize(dots);
+
+			System.out.printf("Building a shape of %d dots\n", shape.getMaxSize());
 
 			if (generateShape(new ArrayList<Dot>(freeDots), shape)) {
+				System.out.printf("Shape created: %s\n", shape);
 				freeDots.removeAll(shape.getDots());
 				shapes.add(shape);
 			}
@@ -104,8 +107,6 @@ public class DotPattern
 				? freeDots.get(new Random().nextInt(freeDots.size() - 1))
 				: freeDots.get(0);
 
-		System.out.printf("Building a shape. Start from %d,%d\n", from.x, from.y);
-
 		if (generateShapeDots(shape, from, freeDots)) {
 			return true;
 		}
@@ -118,14 +119,28 @@ public class DotPattern
 
 	protected Boolean generateShapeDots(DotShape shape, Dot from, List<Dot> freeDots) {
 
-		System.out.printf("trying dot: %d,%d\n", from.x, from.y);
+		if (shape.size() == shape.getMaxSize()) {
 
-		if (freeDots.isEmpty()) { // no more free dots
-			System.out.printf("no more free dots\n");
-			return false;
+			if (!isAllowOpen()) {
+
+				Dot first = shape.getFirst();
+				Dot last  = shape.getLast();
+
+				if (isAllowDiagonals()) {
+					if (Math.abs(first.x - last.x) > 1 || Math.abs(first.y - last.y) > 1)
+						return false;
+				} else {
+					if (Math.abs(first.x - last.x) + Math.abs(first.y - last.y) > 1)
+						return false;
+				}
+
+				shape.close(true);
+			}
+
+			return true; // shape complete
 		}
 
-		if (shape.getDots().contains(from)) {
+		if (freeDots.isEmpty()) { // no more free dots
 			return false;
 		}
 
@@ -133,6 +148,7 @@ public class DotPattern
 
 		List<Dot> dots = new ArrayList<Dot>();
 
+		/*
 		if (from.x + 1 < columns) dots.add(new Dot(from.x + 1, from.y));
 		if (from.y + 1 < rows)    dots.add(new Dot(from.x, from.y + 1));
 		if (from.x - 1 > -1)      dots.add(new Dot(from.x - 1, from.y));
@@ -144,24 +160,91 @@ public class DotPattern
 			if (from.x - 1 > -1 && from.y - 1 > -1)        dots.add(new Dot(from.x - 1, from.y - 1));
 			if (from.x + 1 < columns && from.y - 1 > -1)   dots.add(new Dot(from.x + 1, from.y - 1));
 		}
+		*/
+
+		dots.add(new Dot(from.x + 1, from.y));
+		dots.add(new Dot(from.x, from.y + 1));
+		dots.add(new Dot(from.x - 1, from.y));
+		dots.add(new Dot(from.x, from.y - 1));
+
+		if (isAllowDiagonals()) {
+			dots.add(new Dot(from.x + 1, from.y + 1));
+			dots.add(new Dot(from.x - 1, from.y + 1));
+			dots.add(new Dot(from.x - 1, from.y - 1));
+			dots.add(new Dot(from.x + 1, from.y - 1));
+		}
 
 		while (dots.size() > 0) {
-			Dot next = dots.size() > 1 ? dots.get(new Random().nextInt(dots.size() - 1)) : dots.get(0);
-			shape.getDots().add(from);
 
-			if (generateShapeDots(shape, next, freeDots)) {
-				if (shape.getDots().size() == shape.getDotsMaxCount()) {
-					System.out.printf("shape has already enough dots\n");
-					return true;
+			Dot next = dots.size() > 1 ? dots.get(new Random().nextInt(dots.size() - 1)) : dots.get(0);
+
+			if (next.x < 0 || next.x >= columns || next.y < 0 || next.y >= rows ) {
+				dots.remove(next);
+				continue;
+			}
+
+			if (shape.contains(next)) {
+				dots.remove(next);
+				continue;
+			}
+
+			if (!freeDots.contains(next)) {
+				dots.remove(next);
+				continue;
+			}
+
+			// denying crossing lines
+
+			if (isAllowDiagonals()) {
+
+				Dot dot1 = null, dot2 = null;
+
+				if (next.x - from.x == 1 && next.y - from.y == 1) {
+					dot1 = new Dot(from.x + 1, from.y);
+					dot2 = new Dot(from.x, from.y + 1);
+				} else if (next.x - from.x == -1 && next.y - from.y == 1) {
+					dot1 = new Dot(from.x, from.y + 1);
+					dot2 = new Dot(from.x - 1, from.y);
+				} else if (next.x - from.x == -1 && next.y - from.y == -1) {
+					dot1 = new Dot(from.x - 1, from.y);
+					dot2 = new Dot(from.x, from.y - 1);
+				} else if (next.x - from.x == 1 && next.y - from.y == -1) {
+					dot1 = new Dot(from.x, from.y - 1);
+					dot2 = new Dot(from.x + 1, from.y);
+				}
+
+				DotShape shape1 = getShapeByDot(dot1);
+				DotShape shape2 = getShapeByDot(dot2);
+
+				if ((shape.contains(dot1) || shape.contains(dot2))
+					|| (shape1 != null && shape2 != null && shape1 == shape2)) {
+					dots.remove(next);
+					continue;
 				}
 			}
-			else {
+
+			shape.add(from);
+
+			if (! generateShapeDots(shape, next, freeDots)) {
+				shape.remove(from);
 				dots.remove(next);
-				shape.getDots().remove(from);
-				return false;
+				continue;
 			}
+
+			return true;
 		}
 
 		return false;
+	}
+
+	protected DotShape getShapeByDot(Dot dot) {
+
+		if (shapes.size() > 0) {
+			for (DotShape shape : shapes )
+				if (shape.contains(dot))
+					return shape;
+		}
+
+		return null;
 	}
 }

@@ -22,4 +22,9 @@ public class Dot {
 
 		return super.equals(dot);
 	}
+
+	@Override
+	public String toString() {
+		return "{" + x + ", " + y + "}";
+	}
 }
