@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.scene.shape.Polyline;
+
 import java.util.*;
 
 public class DotPattern
@@ -14,6 +16,7 @@ public class DotPattern
 	private boolean isAllowDiagonals = false;
 
 	private List<DotShape> shapes;
+	private Polyline shapeTestPolyline;
 
 	public DotPattern(int columns, int rows) {
 
@@ -40,6 +43,7 @@ public class DotPattern
 	public void setShapesPerPattern(int shapesPerPattern) { this.shapesPerPattern = shapesPerPattern; }
 	public void setDotsPerPattern(int dotsPerPattern) { this.dotsPerPattern = dotsPerPattern; }
 	public void setColorsPerPattern(int colorsPerPattern) { this.colorsPerPattern = colorsPerPattern; }
+	public void setTestPolyline(Polyline shape) { this.shapeTestPolyline = shape; }
 
 	/**
 	 * Genarates dot pattern of simple shapes
@@ -79,6 +83,8 @@ public class DotPattern
 
 			System.out.printf("Building a shape of %d dots\n", shape.getMaxSize());
 
+			shapeTestPolyline.getPoints().clear();
+
 			if (generateShape(new ArrayList<Dot>(freeDots), shape)) {
 				System.out.printf("Shape created: %s\n", shape);
 				freeDots.removeAll(shape.getDots());
@@ -107,11 +113,18 @@ public class DotPattern
 				? freeDots.get(new Random().nextInt(freeDots.size() - 1))
 				: freeDots.get(0);
 
+		// do not allow to start shape on the grid's edges
+		if (from.x >= columns - 1 || from.x < 1 || from.y < 1 || from.y >= rows - 1) {
+			freeDots.remove(from);
+			return generateShape(freeDots, shape);
+		}
+
+		System.out.printf("[shape] try to build from %s\n", from);
 		if (generateShapeDots(shape, from, freeDots)) {
 			return true;
 		}
 
-		shape.getDots().clear();
+		shape.clear();
 		freeDots.remove(from);
 
 		return generateShape(freeDots, shape);
@@ -148,20 +161,6 @@ public class DotPattern
 
 		List<Dot> dots = new ArrayList<Dot>();
 
-		/*
-		if (from.x + 1 < columns) dots.add(new Dot(from.x + 1, from.y));
-		if (from.y + 1 < rows)    dots.add(new Dot(from.x, from.y + 1));
-		if (from.x - 1 > -1)      dots.add(new Dot(from.x - 1, from.y));
-		if (from.y - 1 > -1)      dots.add(new Dot(from.x, from.y - 1));
-
-		if (isAllowDiagonals()) {
-			if (from.x + 1 < columns && from.y + 1 < rows) dots.add(new Dot(from.x + 1, from.y + 1));
-			if (from.x - 1 > -1 && from.y + 1 < rows)      dots.add(new Dot(from.x - 1, from.y + 1));
-			if (from.x - 1 > -1 && from.y - 1 > -1)        dots.add(new Dot(from.x - 1, from.y - 1));
-			if (from.x + 1 < columns && from.y - 1 > -1)   dots.add(new Dot(from.x + 1, from.y - 1));
-		}
-		*/
-
 		dots.add(new Dot(from.x + 1, from.y));
 		dots.add(new Dot(from.x, from.y + 1));
 		dots.add(new Dot(from.x - 1, from.y));
@@ -183,12 +182,7 @@ public class DotPattern
 				continue;
 			}
 
-			if (shape.contains(next)) {
-				dots.remove(next);
-				continue;
-			}
-
-			if (!freeDots.contains(next)) {
+			if (shape.contains(next) || !freeDots.contains(next)) {
 				dots.remove(next);
 				continue;
 			}
@@ -223,13 +217,26 @@ public class DotPattern
 				}
 			}
 
-			shape.add(from);
+			// shapeTestPolyline.getPoints().addAll(from.x * 40d, from.y * 40d);
 
+			if (isAllowDiagonals() && dots.size() < 3) {
+				// System.out.printf("[dot %d] skiped bad route %s -> %s\n", shape.size() + 1, from, next);
+				freeDots.add(from);
+				return false;
+			}
+
+			shape.add(from);
 			if (! generateShapeDots(shape, next, freeDots)) {
+
+				// System.out.printf("%-" + (shape.size() + 1) + "s" + "[- node] %s -> %s\n", "", from, next);
+				// shapeTestPolyline.getPoints().addAll(from.x * 40d, from.y * 40d);
+
 				shape.remove(from);
 				dots.remove(next);
 				continue;
 			}
+
+			// System.out.printf("%-" + (shape.size() + 1) + "s" + "[+ node] %s -> %s\n", "", from, next);
 
 			return true;
 		}

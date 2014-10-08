@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
@@ -88,11 +89,17 @@ public class App extends Application
 
 			pattern = new DotPattern(8, 8);
 
-			pattern.setDotsPerPattern(26);
-			pattern.setShapesPerPattern(3);
+			pattern.setDotsPerPattern(30);
+			pattern.setShapesPerPattern(4);
 			pattern.setAllowDiagonals(true);
 			pattern.setColorsPerPattern(3);
 			pattern.setAllowOpen(false);
+
+			// debug
+			Polyline shapeTest = new Polyline();
+			shapeTest.getStyleClass().add("colorTest");
+			levelPattern.getChildren().add(shapeTest);
+			pattern.setTestPolyline(shapeTest);
 
 			pattern.generate();
 
@@ -112,6 +119,13 @@ public class App extends Application
 
 					Circle circle = new Circle(dot.x * 40d, dot.y * 40d, 7.5d);
 					circle.getStyleClass().add(colorStyle);
+
+					Label circleLabel = new Label();
+					circleLabel.setText("11");
+					circleLabel.setLayoutX(dot.x * 40d - 12);
+					circleLabel.setLayoutY(dot.y * 40d);
+					gridBackground.getChildren().add(circleLabel);
+
 					levelPattern.getChildren().add(circle);
 				}
 

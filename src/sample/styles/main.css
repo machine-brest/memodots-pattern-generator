@@ -61,6 +61,10 @@
 	-fx-opacity: 0.1;
 }
 
+#levelPattern Circle.colorTest   { -fx-fill: #c6c6c6; }
+#levelPattern Polyline.colorTest { -fx-stroke: #c6c6c6; }
+#levelPattern Polygon.colorTest  { -fx-fill: #c6c6c6; }
+
 #levelPattern Circle.color0   { -fx-fill: #eec55f; }
 #levelPattern Polyline.color0 { -fx-stroke: #eec55f; }
 #levelPattern Polygon.color0  { -fx-fill: #eec55f; }
